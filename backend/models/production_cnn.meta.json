@@ -1,0 +1,80 @@
+{
+  "architecture": "resnet18",
+  "labels": [
+    "Bacteria",
+    "Fungi",
+    "Healthy",
+    "Pests",
+    "Virus"
+  ],
+  "img_size": 224,
+  "best_val_macro_f1": 0.9959982496754962,
+  "test_accuracy": 0.9948359153756455,
+  "test_macro_f1": 0.9948356716948663,
+  "epochs": 8,
+  "batch_size": 32,
+  "max_per_class": 0,
+  "seed": 42,
+  "dataset_root": "C:\\Users\\Viraj\\Desktop\\PlantPathogenDetection\\ml\\datasets\\raw",
+  "artifact": "backend\\models\\resnet18_plantguard.pt",
+  "claim": "visual_symptom_classification",
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.238428583940885,
+      "val_accuracy": 0.9643154910788728,
+      "val_macro_f1": 0.9645015417944995,
+      "seconds": 4057.3594222068787
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.12572766155170562,
+      "val_accuracy": 0.9468067367016841,
+      "val_macro_f1": 0.9462629153540277,
+      "seconds": 5334.90865445137
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.09343904130429989,
+      "val_accuracy": 0.9779889944972486,
+      "val_macro_f1": 0.9779521707302148,
+      "seconds": 3009.798361301422
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.07535217034372639,
+      "val_accuracy": 0.9894947473736868,
+      "val_macro_f1": 0.9894910233943499,
+      "seconds": 4037.803566455841
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.05016526470344888,
+      "val_accuracy": 0.9866599966649992,
+      "val_macro_f1": 0.9866729674843173,
+      "seconds": 4000.515620946884
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.0327666305486996,
+      "val_accuracy": 0.9903284975821244,
+      "val_macro_f1": 0.9903228397256981,
+      "seconds": 3875.9372358322144
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.01915287759929812,
+      "val_accuracy": 0.9929964982491246,
+      "val_macro_f1": 0.9930018783164336,
+      "seconds": 6178.828651666641
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.01267152436597079,
+      "val_accuracy": 0.9959979989994997,
+      "val_macro_f1": 0.9959982496754962,
+      "seconds": 3738.5113821029663
+    }
+  ],
+  "classification_report": "              precision    recall  f1-score   support\n\n    Bacteria     0.9992    0.9950    0.9971      1201\n       Fungi     0.9917    0.9950    0.9933      1200\n     Healthy     0.9941    0.9900    0.9921      1200\n       Pests     0.9917    0.9958    0.9938      1201\n       Virus     0.9975    0.9983    0.9979      1201\n\n    accuracy                         0.9948      6003\n   macro avg     0.9948    0.9948    0.9948      6003\nweighted avg     0.9948    0.9948    0.9948      6003\n"
+}
