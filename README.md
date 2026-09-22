@@ -1,0 +1,2 @@
+# Plant-Pathogen-Detection-and-Classification-Using-Image-Processing-and-Deep-Learning.-
+Plant Pathogen Detection and Classification Using Image Processing and Deep Learning. The proposed system is designed to be deployable on low-cost hardware, and its performance will be rigorously evaluated using standard metrics, with the broader  aim of enabling fast, accessible and reliable plant disease diagnosis for real-world agricultural use.
