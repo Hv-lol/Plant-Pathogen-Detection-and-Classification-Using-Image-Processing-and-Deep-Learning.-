@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-forest: #0f1f17;
+  --color-emerald: #1f6f54;
+  --color-leaf: #3d8b6e;
+  --color-mist: #f3f6f2;
+  --color-charcoal: #1c2420;
+  --color-moss: #2a4a3a;
+  --color-sage: #8fad9c;
+  --color-cream: #e8f0ea;
+  --color-danger: #b54a3c;
+  --color-warning: #b8860b;
+  --surface: #ffffff;
+  --border: rgba(28, 36, 32, 0.1);
+  --muted: rgba(28, 36, 32, 0.62);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-mist text-charcoal font-sans antialiased;
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background: rgba(31, 111, 84, 0.22);
+  }
+
+  a {
+    @apply transition-colors duration-200 ease-smooth;
+  }
+}
+
+@layer components {
+  .section-pad {
+    @apply px-5 sm:px-8 lg:px-12;
+  }
+
+  .container-narrow {
+    @apply mx-auto w-full max-w-6xl;
+  }
+
+  .display-title {
+    @apply font-display font-semibold tracking-tight text-charcoal;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.16em] text-emerald;
+  }
+
+  .surface-panel {
+    @apply border-t border-[var(--border)] bg-white/70 backdrop-blur-sm;
+  }
+
+  .link-underline {
+    @apply relative inline-flex after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-smooth hover:after:scale-x-100;
+  }
+
+  .stage-dot {
+    @apply h-2 w-2 rounded-full bg-sage transition-colors duration-300;
+  }
+
+  .stage-dot-active {
+    @apply bg-emerald shadow-[0_0_0_4px_rgba(31,111,84,0.15)];
+  }
+
+  .stage-dot-done {
+    @apply bg-leaf;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.45s ease-smooth both;
+  }
+
+  .slide-up {
+    animation: slideUp 0.5s ease-smooth both;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
