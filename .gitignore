@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+*.tsbuildinfo
+npm-debug.log*
+
+# Env
+.env
+.env.local
+
+# App runtime state (SQLite DB, uploaded files)
+backend/plantguard.db
+backend/storage/
+
+# ML datasets and trained weights (large binaries; fetch/train locally)
+ml/datasets/raw/
+ml/datasets/*.zip
+*.pt
+*.pth
+
+# OS
+.DS_Store
