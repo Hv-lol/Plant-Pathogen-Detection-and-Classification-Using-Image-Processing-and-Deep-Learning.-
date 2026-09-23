@@ -1,0 +1,9 @@
+# Only needed for ml/datasets/download.py and ml/training/train_cnn.py.
+# The API itself (backend/requirements.txt) does not need any of this —
+# it falls back to the sklearn bootstrap classifier when no CNN is trained.
+kagglehub>=0.3
+torch>=2.2
+torchvision>=0.17
+scikit-learn>=1.4
+pillow>=10.3
+numpy>=1.26
