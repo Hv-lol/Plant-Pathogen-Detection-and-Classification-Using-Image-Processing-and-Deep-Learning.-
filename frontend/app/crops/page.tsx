@@ -1,11 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
+import { SkeletonCard } from "@/components/Skeleton";
+import { useToast } from "@/components/Toast";
 import { api, ApiError, type Crop } from "@/lib/api";
+import { fadeUp, staggerContainer, staggerItem, easeSmooth } from "@/lib/motion";
 
 export default function CropsPage() {
+  const toast = useToast();
   const [crops, setCrops] = useState<Crop[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -18,7 +23,9 @@ export default function CropsPage() {
         if (!cancelled) setCrops(rows);
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : "Failed to load crops.");
+          const message = err instanceof ApiError ? err.message : "Failed to load crops.";
+          setError(message);
+          toast.push({ title: "Couldn't load crops", description: message, tone: "error" });
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -28,32 +35,48 @@ export default function CropsPage() {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <AppShell>
-      <div className="max-w-2xl">
+      <motion.div initial="hidden" animate="show" variants={fadeUp} className="max-w-2xl">
         <p className="eyebrow">Knowledge</p>
         <h1 className="mt-2 font-display text-4xl text-charcoal">Crops</h1>
         <p className="mt-3 text-sm text-charcoal/60">
           This release classifies pathogen categories across general field-crop
           imagery (not crop-specific disease names).
         </p>
-      </div>
+      </motion.div>
 
-      {error && <p className="mt-6 text-sm text-danger">{error}</p>}
+      {!loading && error && <p className="mt-6 text-sm text-danger">{error}</p>}
 
       {loading ? (
-        <p className="mt-10 text-sm text-charcoal/45">Loading…</p>
+        <div className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
       ) : crops.length === 0 ? (
         <EmptyState
           title="No crops listed"
           description="Crop entries will appear here once the knowledge base is seeded."
         />
       ) : (
-        <ul className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.ul
+          className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3"
+          initial="hidden"
+          animate="show"
+          variants={staggerContainer}
+        >
           {crops.map((c) => (
-            <li key={c.id} className="border-t border-charcoal/10 pt-5">
+            <motion.li
+              key={c.id}
+              variants={staggerItem}
+              whileHover={{ y: -3 }}
+              transition={{ duration: 0.2, ease: easeSmooth }}
+              className="border-t border-charcoal/10 pt-5"
+            >
               <h2 className="font-display text-2xl text-charcoal">{c.name}</h2>
               {c.scientific_name && (
                 <p className="mt-1 text-sm italic text-charcoal/50">
@@ -65,9 +88,9 @@ export default function CropsPage() {
                   {c.description}
                 </p>
               )}
-            </li>
+            </motion.li>
           ))}
-        </ul>
+        </motion.ul>
       )}
     </AppShell>
   );

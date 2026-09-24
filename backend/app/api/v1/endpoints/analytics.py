@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from sqlalchemy import func
+from sqlalchemy import case, func
 
 from app.api.deps import CurrentUser, DbSession, RequestId
 from app.core.errors import success_body
-from app.models import Diagnosis
+from app.models import Diagnosis, Prediction
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
@@ -15,27 +15,38 @@ def overview(db: DbSession, user: CurrentUser, request_id: RequestId):
     completed = q.filter_by(status="COMPLETED").count()
     failed = q.filter_by(status="FAILED").count()
 
-    healthy = 0
-    diseased = 0
-    conf_sum = 0.0
-    conf_n = 0
-    for d in q.filter_by(status="COMPLETED").all():
-        top = next((p for p in d.predictions if p.rank == 1), None)
-        if top:
-            if top.label == "Healthy" or top.label.lower() == "healthy":
-                healthy += 1
-            else:
-                diseased += 1
-        if d.overall_confidence is not None:
-            conf_sum += d.overall_confidence
-            conf_n += 1
+    avg_confidence = (
+        db.query(func.avg(Diagnosis.overall_confidence))
+        .filter(
+            Diagnosis.user_id == user.id,
+            Diagnosis.status == "COMPLETED",
+            Diagnosis.overall_confidence.isnot(None),
+        )
+        .scalar()
+    ) or 0.0
+
+    healthy_count, top_prediction_count = (
+        db.query(
+            func.sum(case((Prediction.label == "Healthy", 1), else_=0)),
+            func.count(Prediction.id),
+        )
+        .join(Diagnosis, Diagnosis.id == Prediction.diagnosis_id)
+        .filter(
+            Diagnosis.user_id == user.id,
+            Diagnosis.status == "COMPLETED",
+            Prediction.rank == 1,
+        )
+        .one()
+    )
+    healthy = healthy_count or 0
+    diseased = (top_prediction_count or 0) - healthy
 
     return success_body(
         {
             "total_diagnoses": total,
             "healthy_detections": healthy,
             "diseased_detections": diseased,
-            "average_confidence": (conf_sum / conf_n) if conf_n else 0.0,
+            "average_confidence": avg_confidence,
             "completed_diagnoses": completed,
             "failed_diagnoses": failed,
         },

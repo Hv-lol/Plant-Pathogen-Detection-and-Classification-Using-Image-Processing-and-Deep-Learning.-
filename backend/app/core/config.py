@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     APP_ENV: str = "local"
     API_V1_PREFIX: str = "/api/v1"
     FRONTEND_URL: str = "http://localhost:3000"
-    BACKEND_CORS_ORIGINS: str = "http://localhost:3000"
+    BACKEND_CORS_ORIGINS: str = "http://localhost:3000,http://localhost:3001"
 
     SECRET_KEY: str = "change-me-to-a-long-random-string"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30

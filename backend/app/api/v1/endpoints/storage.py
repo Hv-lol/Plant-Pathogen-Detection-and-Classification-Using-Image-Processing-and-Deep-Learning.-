@@ -16,6 +16,6 @@ def get_object(object_path: str, user: CurrentUser):
     # enforced at image/diagnosis endpoints for listings.
     root = settings.storage_root.resolve()
     path = (root / object_path).resolve()
-    if not str(path).startswith(str(root)) or not path.exists() or not path.is_file():
+    if not path.is_relative_to(root) or not path.exists() or not path.is_file():
         raise AppError("NOT_FOUND", "Object not found.", 404)
     return FileResponse(path)

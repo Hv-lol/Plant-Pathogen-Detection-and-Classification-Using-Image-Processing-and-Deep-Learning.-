@@ -3,11 +3,15 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/Badge";
 import { EmptyState } from "@/components/EmptyState";
+import { Skeleton } from "@/components/Skeleton";
+import { useToast } from "@/components/Toast";
 import { api, ApiError, type Diagnosis } from "@/lib/api";
 import { formatConfidence, formatDate } from "@/lib/utils";
+import { fadeUp, staggerContainer, staggerItem } from "@/lib/motion";
 
 function statusTone(status: string) {
   const s = status.toUpperCase();
@@ -18,6 +22,7 @@ function statusTone(status: string) {
 
 export default function HistoryPage() {
   const router = useRouter();
+  const toast = useToast();
   const [rows, setRows] = useState<Diagnosis[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -30,7 +35,9 @@ export default function HistoryPage() {
         if (!cancelled) setRows(list);
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : "Failed to load history.");
+          const message = err instanceof ApiError ? err.message : "Failed to load history.";
+          setError(message);
+          toast.push({ title: "Couldn't load history", description: message, tone: "error" });
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -40,23 +47,33 @@ export default function HistoryPage() {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <AppShell>
-      <div>
+      <motion.div initial="hidden" animate="show" variants={fadeUp}>
         <p className="eyebrow">Archive</p>
         <h1 className="mt-2 font-display text-4xl text-charcoal">Diagnosis history</h1>
         <p className="mt-3 max-w-xl text-sm text-charcoal/60">
           Every analysis you run is listed here with status, top prediction, and
           confidence.
         </p>
-      </div>
+      </motion.div>
 
-      {error && <p className="mt-6 text-sm text-danger">{error}</p>}
+      {!loading && error && <p className="mt-6 text-sm text-danger">{error}</p>}
 
       {loading ? (
-        <p className="mt-10 text-sm text-charcoal/45">Loading…</p>
+        <div className="mt-10 space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center justify-between gap-4 border-b border-charcoal/8 py-4">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+          ))}
+        </div>
       ) : rows.length === 0 ? (
         <EmptyState
           title="No history yet"
@@ -75,12 +92,13 @@ export default function HistoryPage() {
                 <th className="pb-3 font-semibold">Status</th>
               </tr>
             </thead>
-            <tbody>
+            <motion.tbody initial="hidden" animate="show" variants={staggerContainer}>
               {rows.map((d) => {
                 const top = d.predictions?.[0];
                 return (
-                  <tr
+                  <motion.tr
                     key={d.id}
+                    variants={staggerItem}
                     className="border-b border-charcoal/8 transition-colors hover:bg-white/60"
                   >
                     <td className="py-4 text-charcoal/60">{formatDate(d.created_at)}</td>
@@ -98,10 +116,10 @@ export default function HistoryPage() {
                     <td className="py-4">
                       <Badge tone={statusTone(d.status)}>{d.status}</Badge>
                     </td>
-                  </tr>
+                  </motion.tr>
                 );
               })}
-            </tbody>
+            </motion.tbody>
           </table>
         </div>
       )}

@@ -296,6 +296,7 @@ def process_diagnosis(db: Session, diagnosis_id: str) -> Diagnosis:
         return diagnosis
 
     except Exception as exc:  # noqa: BLE001
+        db.rollback()
         diagnosis.status = DiagnosisStatus.FAILED.value
         diagnosis.job_stage = "failed"
         if str(exc) == "MODEL_NOT_AVAILABLE":

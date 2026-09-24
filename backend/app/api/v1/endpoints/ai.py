@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from sqlalchemy import func
 
 from app.api.deps import CurrentUser, DbSession, RequestId
 from app.core.errors import success_body

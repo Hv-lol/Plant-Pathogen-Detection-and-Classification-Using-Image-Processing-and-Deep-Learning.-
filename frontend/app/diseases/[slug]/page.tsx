@@ -3,19 +3,22 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/Badge";
+import { SkeletonText } from "@/components/Skeleton";
 import { api, ApiError, type Disease } from "@/lib/api";
+import { staggerContainer, staggerItem } from "@/lib/motion";
 
 function Section({ title, body }: { title: string; body?: string | null }) {
   if (!body) return null;
   return (
-    <section className="border-t border-charcoal/10 pt-8">
+    <motion.section variants={staggerItem} className="border-t border-charcoal/10 pt-8">
       <h2 className="font-display text-2xl text-charcoal">{title}</h2>
       <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-charcoal/70">
         {body}
       </p>
-    </section>
+    </motion.section>
   );
 }
 
@@ -52,12 +55,21 @@ export default function DiseaseDetailPage() {
         ← Disease library
       </Link>
 
-      {loading && <p className="mt-10 text-sm text-charcoal/45">Loading…</p>}
-      {error && <p className="mt-10 text-sm text-danger">{error}</p>}
+      {loading && (
+        <div className="mt-10 max-w-3xl space-y-4">
+          <SkeletonText lines={4} />
+        </div>
+      )}
+      {!loading && error && <p className="mt-10 text-sm text-danger">{error}</p>}
 
       {disease && (
-        <article className="mt-8 max-w-3xl space-y-10 slide-up">
-          <header>
+        <motion.article
+          className="mt-8 max-w-3xl space-y-10"
+          initial="hidden"
+          animate="show"
+          variants={staggerContainer}
+        >
+          <motion.header variants={staggerItem}>
             <div className="flex flex-wrap gap-2">
               {disease.pathogen_type && <Badge tone="info">{disease.pathogen_type}</Badge>}
             </div>
@@ -74,19 +86,22 @@ export default function DiseaseDetailPage() {
                 {disease.description}
               </p>
             )}
-          </header>
+          </motion.header>
 
           <Section title="Symptoms" body={disease.symptoms} />
           <Section title="Cause" body={disease.cause} />
           <Section title="Prevention" body={disease.prevention} />
           <Section title="Management notes" body={disease.management_notes} />
 
-          <aside className="rounded-md bg-cream/80 px-5 py-4 text-sm text-charcoal/65">
+          <motion.aside
+            variants={staggerItem}
+            className="rounded-md bg-cream/80 px-5 py-4 text-sm text-charcoal/65"
+          >
             Knowledge entries support education and awareness. Confirm critical
             decisions with qualified agronomists or laboratory testing—PlantGuard
             does not provide laboratory pathogen confirmation.
-          </aside>
-        </article>
+          </motion.aside>
+        </motion.article>
       )}
     </AppShell>
   );

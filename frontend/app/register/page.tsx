@@ -5,11 +5,13 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
+import { useToast } from "@/components/Toast";
 import { useAuth } from "@/lib/auth";
 import { ApiError } from "@/lib/api";
 
 export default function RegisterPage() {
   const { register } = useAuth();
+  const toast = useToast();
   const router = useRouter();
 
   const [fullName, setFullName] = useState("");
@@ -26,7 +28,9 @@ export default function RegisterPage() {
       await register(email, password, fullName);
       router.replace("/dashboard");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Registration failed.");
+      const message = err instanceof ApiError ? err.message : "Registration failed.";
+      setError(message);
+      toast.push({ title: "Registration failed", description: message, tone: "error" });
     } finally {
       setLoading(false);
     }

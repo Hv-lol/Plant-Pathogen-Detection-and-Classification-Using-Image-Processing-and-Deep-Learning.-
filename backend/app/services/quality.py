@@ -18,19 +18,6 @@ class QualityResult:
     height: int
 
 
-def _laplacian_variance(gray: np.ndarray) -> float:
-    # Approximate blur metric without requiring OpenCV at import time.
-    # Laplacian kernel convolution via NumPy.
-    kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]], dtype=np.float32)
-    padded = np.pad(gray.astype(np.float32), 1, mode="edge")
-    out = np.zeros_like(gray, dtype=np.float32)
-    for i in range(gray.shape[0]):
-        for j in range(gray.shape[1]):
-            region = padded[i : i + 3, j : j + 3]
-            out[i, j] = float(np.sum(region * kernel))
-    return float(out.var())
-
-
 def assess_image_quality(data: bytes) -> QualityResult:
     try:
         img = PILImage.open(BytesIO(data))

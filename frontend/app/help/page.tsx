@@ -1,4 +1,8 @@
+"use client";
+
 import { AppShell } from "@/components/AppShell";
+import { Reveal } from "@/components/Reveal";
+import { fadeUp } from "@/lib/motion";
 
 const sections = [
   {
@@ -31,18 +35,18 @@ const sections = [
 export default function HelpPage() {
   return (
     <AppShell>
-      <div className="max-w-2xl">
+      <Reveal variants={fadeUp} className="max-w-2xl">
         <p className="eyebrow">Support</p>
         <h1 className="mt-2 font-display text-4xl text-charcoal">Help & guidance</h1>
         <p className="mt-3 text-sm leading-relaxed text-charcoal/60">
           How to interpret PlantGuard results responsibly and capture imagery
           that gives the models their best chance.
         </p>
-      </div>
+      </Reveal>
 
       <div className="mt-14 max-w-3xl space-y-14">
         {sections.map((section) => (
-          <section key={section.title} className="border-t border-charcoal/10 pt-8">
+          <Reveal key={section.title} className="border-t border-charcoal/10 pt-8">
             <h2 className="font-display text-2xl text-charcoal">{section.title}</h2>
             <ul className="mt-5 space-y-4">
               {section.body.map((item) => (
@@ -54,15 +58,15 @@ export default function HelpPage() {
                 </li>
               ))}
             </ul>
-          </section>
+          </Reveal>
         ))}
 
-        <aside className="rounded-md bg-cream/80 px-5 py-4 text-sm leading-relaxed text-charcoal/70">
+        <Reveal className="rounded-md bg-cream/80 px-5 py-4 text-sm leading-relaxed text-charcoal/70">
           <strong className="font-medium text-charcoal">Scientific disclaimer: </strong>
           Visual symptom classification is not laboratory-confirmed pathogen
           identification. Consult qualified agronomic or plant pathology experts
           when disease confirmation is required.
-        </aside>
+        </Reveal>
       </div>
     </AppShell>
   );

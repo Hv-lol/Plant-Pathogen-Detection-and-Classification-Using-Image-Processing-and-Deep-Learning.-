@@ -16,9 +16,11 @@ npm-debug.log*
 .env
 .env.local
 
-# App runtime state (SQLite DB, uploaded files)
+# App runtime state (SQLite DB, uploaded files, auto-bootstrapped baseline model)
 backend/plantguard.db
 backend/storage/
+backend/models/sklearn_baseline.pkl
+backend/models/sklearn_baseline.meta.json
 
 # ML datasets and trained weights (large binaries; fetch/train locally)
 ml/datasets/raw/

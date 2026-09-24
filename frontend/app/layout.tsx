@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Source_Serif_4 } from "next/font/google";
 import { AuthProvider } from "@/lib/auth";
+import { ToastProvider } from "@/components/Toast";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -29,7 +30,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${manrope.variable} ${sourceSerif.variable}`}>
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <ToastProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ToastProvider>
       </body>
     </html>
   );

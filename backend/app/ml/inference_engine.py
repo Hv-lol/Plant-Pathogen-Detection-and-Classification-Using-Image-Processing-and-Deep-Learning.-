@@ -175,7 +175,7 @@ class InferenceEngine:
         mods = _try_import_torch()
         if cnn_path.exists() and mods is not None:
             torch, models, transforms = mods
-            ckpt = torch.load(cnn_path, map_location="cpu", weights_only=False)
+            ckpt = torch.load(cnn_path, map_location="cpu", weights_only=True)
             labels = ckpt.get("labels", CLASS_LABELS)
             arch = ckpt.get("architecture", "resnet18")
             model = _build_torch_model(mods, arch, len(labels))

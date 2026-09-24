@@ -226,10 +226,35 @@ export type RequestOptions = {
   headers?: Record<string, string>;
 };
 
-export async function apiRequest<T>(
-  path: string,
-  options: RequestOptions = {}
-): Promise<T> {
+let refreshInFlight: Promise<boolean> | null = null;
+
+/** Exchanges the stored refresh token for a new token pair. Single-flight
+ * across concurrent callers so a burst of 401s only triggers one refresh. */
+function refreshSession(): Promise<boolean> {
+  if (!refreshInFlight) {
+    refreshInFlight = (async () => {
+      const refreshToken = getRefreshToken();
+      if (!refreshToken) return false;
+      try {
+        const tokens = await apiRequest<Tokens>("/auth/refresh", {
+          method: "POST",
+          body: { refresh_token: refreshToken },
+          auth: false,
+        });
+        setTokens(tokens);
+        return true;
+      } catch {
+        clearTokens();
+        return false;
+      }
+    })().finally(() => {
+      refreshInFlight = null;
+    });
+  }
+  return refreshInFlight;
+}
+
+async function doFetch(path: string, options: RequestOptions): Promise<Response> {
   const headers: Record<string, string> = { ...(options.headers || {}) };
   const auth = options.auth !== false;
 
@@ -246,11 +271,32 @@ export async function apiRequest<T>(
     body = JSON.stringify(options.body);
   }
 
-  const res = await fetch(resolveUrl(path), {
+  return fetch(resolveUrl(path), {
     method: options.method || (options.body || options.formData ? "POST" : "GET"),
     headers,
     body,
   });
+}
+
+export async function apiRequest<T>(
+  path: string,
+  options: RequestOptions = {},
+  _retried = false
+): Promise<T> {
+  const res = await doFetch(path, options);
+
+  if (
+    res.status === 401 &&
+    options.auth !== false &&
+    !_retried &&
+    path !== "/auth/refresh" &&
+    getRefreshToken()
+  ) {
+    const refreshed = await refreshSession();
+    if (refreshed) {
+      return apiRequest<T>(path, options, true);
+    }
+  }
 
   return parseEnvelope<T>(res);
 }
@@ -332,6 +378,13 @@ export const api = {
 
   listCrops() {
     return apiRequest<Crop[]>("/crops", { auth: false });
+  },
+
+  logout(refreshToken: string) {
+    return apiRequest<{ logged_out: boolean }>("/auth/logout", {
+      method: "POST",
+      body: { refresh_token: refreshToken },
+    });
   },
 };
 

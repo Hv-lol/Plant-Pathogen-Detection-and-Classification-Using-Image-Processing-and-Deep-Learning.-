@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { Input } from "@/components/Input";
+import { SkeletonRow } from "@/components/Skeleton";
 import { api, ApiError, type Disease } from "@/lib/api";
+import { fadeUp, staggerContainer, staggerItem } from "@/lib/motion";
 
 export default function DiseasesPage() {
   const [q, setQ] = useState("");
@@ -36,14 +39,14 @@ export default function DiseasesPage() {
 
   return (
     <AppShell>
-      <div className="max-w-2xl">
+      <motion.div initial="hidden" animate="show" variants={fadeUp} className="max-w-2xl">
         <p className="eyebrow">Knowledge</p>
         <h1 className="mt-2 font-display text-4xl text-charcoal">Pathogen categories</h1>
         <p className="mt-3 text-sm text-charcoal/60">
           Reference for the five visual classes in this model: Bacteria, Fungi,
           Healthy, Pests, and Virus. Educational context only—not lab diagnostics.
         </p>
-      </div>
+      </motion.div>
 
       <div className="mt-8 max-w-md">
         <Input
@@ -57,16 +60,25 @@ export default function DiseasesPage() {
       {error && <p className="mt-6 text-sm text-danger">{error}</p>}
 
       {loading ? (
-        <p className="mt-10 text-sm text-charcoal/45">Loading…</p>
+        <div className="mt-10 divide-y divide-charcoal/10">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <SkeletonRow key={i} />
+          ))}
+        </div>
       ) : diseases.length === 0 ? (
         <EmptyState
           title="No matches"
           description="Try a different search term or browse when the knowledge base is populated."
         />
       ) : (
-        <ul className="mt-10 divide-y divide-charcoal/10">
+        <motion.ul
+          className="mt-10 divide-y divide-charcoal/10"
+          initial="hidden"
+          animate="show"
+          variants={staggerContainer}
+        >
           {diseases.map((d) => (
-            <li key={d.id}>
+            <motion.li key={d.id} variants={staggerItem}>
               <Link
                 href={`/diseases/${d.slug}`}
                 className="group flex flex-col gap-1 py-5 transition-colors hover:bg-white/50 sm:flex-row sm:items-baseline sm:justify-between"
@@ -86,9 +98,9 @@ export default function DiseasesPage() {
                   {d.description || d.symptoms || "View details"}
                 </p>
               </Link>
-            </li>
+            </motion.li>
           ))}
-        </ul>
+        </motion.ul>
       )}
     </AppShell>
   );

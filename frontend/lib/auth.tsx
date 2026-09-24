@@ -13,6 +13,7 @@ import {
   api,
   clearTokens,
   getAccessToken,
+  getRefreshToken,
   setTokens,
   type User,
 } from "./api";
@@ -75,8 +76,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const logout = useCallback(() => {
+    const refreshToken = getRefreshToken();
     clearTokens();
     setUser(null);
+    if (refreshToken) {
+      void api.logout(refreshToken).catch(() => undefined);
+    }
   }, []);
 
   const value = useMemo(

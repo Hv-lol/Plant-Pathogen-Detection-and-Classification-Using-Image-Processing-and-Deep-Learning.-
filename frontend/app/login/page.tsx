@@ -5,11 +5,13 @@ import { Suspense, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
+import { useToast } from "@/components/Toast";
 import { useAuth } from "@/lib/auth";
 import { ApiError } from "@/lib/api";
 
 function LoginForm() {
   const { login } = useAuth();
+  const toast = useToast();
   const router = useRouter();
   const search = useSearchParams();
   const next = search.get("next") || "/dashboard";
@@ -27,7 +29,9 @@ function LoginForm() {
       await login(email, password);
       router.replace(next);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Sign in failed.");
+      const message = err instanceof ApiError ? err.message : "Sign in failed.";
+      setError(message);
+      toast.push({ title: "Sign in failed", description: message, tone: "error" });
     } finally {
       setLoading(false);
     }

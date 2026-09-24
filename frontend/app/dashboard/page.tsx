@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
 import { MetricStat } from "@/components/MetricStat";
+import { SkeletonStat } from "@/components/Skeleton";
+import { useToast } from "@/components/Toast";
 import {
   api,
   ApiError,
@@ -14,6 +17,7 @@ import {
   type Diagnosis,
 } from "@/lib/api";
 import { formatConfidence, formatDate } from "@/lib/utils";
+import { fadeUp, staggerContainer, staggerItem } from "@/lib/motion";
 import { useRouter } from "next/navigation";
 
 function statusTone(status: string) {
@@ -25,6 +29,7 @@ function statusTone(status: string) {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const toast = useToast();
   const [overview, setOverview] = useState<AnalyticsOverview | null>(null);
   const [recent, setRecent] = useState<Diagnosis[]>([]);
   const [error, setError] = useState("");
@@ -43,7 +48,9 @@ export default function DashboardPage() {
         setRecent(list.slice(0, 6));
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : "Failed to load dashboard.");
+          const message = err instanceof ApiError ? err.message : "Failed to load dashboard.";
+          setError(message);
+          toast.push({ title: "Couldn't load dashboard", description: message, tone: "error" });
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -53,11 +60,17 @@ export default function DashboardPage() {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <AppShell>
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={fadeUp}
+        className="flex flex-wrap items-end justify-between gap-4"
+      >
         <div>
           <p className="eyebrow">Overview</p>
           <h1 className="mt-2 font-display text-4xl text-charcoal">Dashboard</h1>
@@ -68,15 +81,24 @@ export default function DashboardPage() {
         <Link href="/analyze">
           <Button>New analysis</Button>
         </Link>
-      </div>
+      </motion.div>
 
-      {error && <p className="mt-6 text-sm text-danger">{error}</p>}
+      {!loading && error && <p className="mt-6 text-sm text-danger">{error}</p>}
 
       {loading ? (
-        <p className="mt-12 text-sm text-charcoal/45">Loading metrics…</p>
+        <div className="mt-12 grid gap-8 border-y border-charcoal/10 py-10 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <SkeletonStat key={i} />
+          ))}
+        </div>
       ) : (
         <>
-          <div className="mt-12 grid gap-8 border-y border-charcoal/10 py-10 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.div
+            className="mt-12 grid gap-8 border-y border-charcoal/10 py-10 sm:grid-cols-2 lg:grid-cols-3"
+            initial="hidden"
+            animate="show"
+            variants={staggerContainer}
+          >
             <MetricStat
               label="Total diagnoses"
               value={overview?.total_diagnoses ?? 0}
@@ -98,7 +120,7 @@ export default function DashboardPage() {
               label="Diseased detections"
               value={overview?.diseased_detections ?? 0}
             />
-          </div>
+          </motion.div>
 
           <section className="mt-12">
             <div className="flex items-baseline justify-between gap-4">
@@ -116,11 +138,16 @@ export default function DashboardPage() {
                 onAction={() => router.push("/analyze")}
               />
             ) : (
-              <ul className="mt-6 divide-y divide-charcoal/10">
+              <motion.ul
+                className="mt-6 divide-y divide-charcoal/10"
+                initial="hidden"
+                animate="show"
+                variants={staggerContainer}
+              >
                 {recent.map((d) => {
                   const top = d.predictions?.[0];
                   return (
-                    <li key={d.id}>
+                    <motion.li key={d.id} variants={staggerItem}>
                       <Link
                         href={`/diagnosis/${d.id}`}
                         className="flex flex-wrap items-center justify-between gap-3 py-4 transition-colors hover:bg-white/60"
@@ -140,10 +167,10 @@ export default function DashboardPage() {
                           <Badge tone={statusTone(d.status)}>{d.status}</Badge>
                         </div>
                       </Link>
-                    </li>
+                    </motion.li>
                   );
                 })}
-              </ul>
+              </motion.ul>
             )}
           </section>
         </>
