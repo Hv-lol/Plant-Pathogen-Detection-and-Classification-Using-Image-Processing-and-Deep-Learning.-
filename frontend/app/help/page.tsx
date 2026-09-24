@@ -32,6 +32,29 @@ const sections = [
   },
 ];
 
+const faqs = [
+  {
+    q: "Can PlantGuard tell me the exact disease, like \"tomato late blight\"?",
+    a: "No. This release classifies images into five broad visual categories (Bacteria, Fungi, Healthy, Pests, Virus), not species- or crop-specific disease names. Treat it as a first read, not a final diagnosis.",
+  },
+  {
+    q: "Why did I get a low-confidence result?",
+    a: "Low confidence usually means the symptoms are ambiguous, the image quality is poor, or the plant shows a mix of categories at once (e.g., pest damage that has invited a secondary fungal infection). Try a clearer, closer photo of the most affected tissue.",
+  },
+  {
+    q: "Does a \"Healthy\" result mean my plant definitely has no problems?",
+    a: "No. It means the photographed tissue didn't show recognizable symptom patterns at the time of the scan. Latent infections and early pest colonization can be invisible in a single photo—keep scouting regularly.",
+  },
+  {
+    q: "What crops does this work on?",
+    a: "The model was trained on general field-crop imagery rather than a single species, so it can be pointed at most common field and horticultural crops that show foliar symptoms. It does not tailor advice per crop.",
+  },
+  {
+    q: "Is my uploaded image stored or shared?",
+    a: "Uploaded images are stored against your account so you can revisit past diagnoses in History. See the project's data handling notes in the repository for storage specifics before uploading sensitive material.",
+  },
+];
+
 export default function HelpPage() {
   return (
     <AppShell>
@@ -60,6 +83,27 @@ export default function HelpPage() {
             </ul>
           </Reveal>
         ))}
+
+        <Reveal className="border-t border-charcoal/10 pt-8">
+          <h2 className="font-display text-2xl text-charcoal">
+            Frequently asked questions
+          </h2>
+          <div className="mt-5 divide-y divide-charcoal/10">
+            {faqs.map((item) => (
+              <details key={item.q} className="group py-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-medium text-charcoal marker:content-none">
+                  {item.q}
+                  <span className="shrink-0 text-charcoal/40 transition-transform duration-200 group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-charcoal/65">
+                  {item.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </Reveal>
 
         <Reveal className="rounded-md bg-cream/80 px-5 py-4 text-sm leading-relaxed text-charcoal/70">
           <strong className="font-medium text-charcoal">Scientific disclaimer: </strong>

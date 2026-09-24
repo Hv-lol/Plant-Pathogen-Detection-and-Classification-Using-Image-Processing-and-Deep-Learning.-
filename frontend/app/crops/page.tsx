@@ -9,6 +9,11 @@ import { useToast } from "@/components/Toast";
 import { api, ApiError, type Crop } from "@/lib/api";
 import { fadeUp, staggerContainer, staggerItem, easeSmooth } from "@/lib/motion";
 
+const exampleCrops = [
+  "Tomato", "Potato", "Pepper", "Maize", "Wheat", "Rice",
+  "Cotton", "Soybean", "Grape", "Citrus", "Apple", "Cucumber",
+];
+
 export default function CropsPage() {
   const toast = useToast();
   const [crops, setCrops] = useState<Crop[]>([]);
@@ -92,6 +97,36 @@ export default function CropsPage() {
           ))}
         </motion.ul>
       )}
+
+      <motion.div
+        className="mt-16 border-t border-charcoal/10 pt-8"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-80px" }}
+        variants={staggerContainer}
+      >
+        <motion.p variants={staggerItem} className="eyebrow">
+          Field coverage
+        </motion.p>
+        <motion.h2 variants={staggerItem} className="mt-2 font-display text-2xl text-charcoal">
+          Crops commonly represented in the training imagery
+        </motion.h2>
+        <motion.p variants={staggerItem} className="mt-3 max-w-2xl text-sm leading-relaxed text-charcoal/60">
+          The model isn&apos;t tuned per crop, so it doesn&apos;t give crop-specific
+          disease names—but it has seen foliage from a broad mix of field and
+          horticultural crops, including these:
+        </motion.p>
+        <motion.div variants={staggerItem} className="mt-6 flex flex-wrap gap-2.5">
+          {exampleCrops.map((crop) => (
+            <span
+              key={crop}
+              className="rounded-full border border-charcoal/10 bg-white/60 px-4 py-1.5 text-sm text-charcoal/70"
+            >
+              {crop}
+            </span>
+          ))}
+        </motion.div>
+      </motion.div>
     </AppShell>
   );
 }

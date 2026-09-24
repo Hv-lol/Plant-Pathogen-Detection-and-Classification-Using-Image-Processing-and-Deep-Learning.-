@@ -6,7 +6,7 @@ import { MarketingShell } from "@/components/AppShell";
 import { Button } from "@/components/Button";
 import { Reveal } from "@/components/Reveal";
 import { AnimatedNumber } from "@/components/AnimatedNumber";
-import { staggerContainer, staggerItem, fadeUp, easeSmooth } from "@/lib/motion";
+import { staggerContainer, staggerItem, fadeUp, easeSmooth, viewportOnce } from "@/lib/motion";
 
 const steps = [
   {
@@ -24,6 +24,25 @@ const steps = [
 ];
 
 const classes = ["Bacteria", "Fungi", "Healthy", "Pests", "Virus"];
+
+const audiences = [
+  {
+    title: "Growers & farm scouts",
+    body: "Triage suspect plants in the field before deciding whether a full agronomist visit is warranted.",
+  },
+  {
+    title: "Agronomists & extension officers",
+    body: "Use ranked predictions and confidence as a starting point when fielding remote photo queries.",
+  },
+  {
+    title: "Home & hobbyist gardeners",
+    body: "Get a fast, judgment-free read on a worrying leaf before searching forums for a diagnosis.",
+  },
+  {
+    title: "Researchers & students",
+    body: "Explore visual symptom classification on your own imagery for coursework or applied projects.",
+  },
+];
 
 const benchmarks = [
   { value: 99.48, suffix: "%", label: "Test accuracy", hint: "Full-dataset ResNet-18 benchmark" },
@@ -241,6 +260,42 @@ export default function HomePage() {
               >
                 {c}
               </motion.span>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="border-t border-charcoal/10 bg-mist text-charcoal">
+        <div className="container-narrow section-pad py-20 lg:py-24">
+          <Reveal className="max-w-2xl">
+            <p className="eyebrow" style={{ color: "var(--color-warning)" }}>
+              Who it&apos;s for
+            </p>
+            <h2 className="mt-3 font-display text-3xl sm:text-4xl">
+              One scan, four different kinds of decisions.
+            </h2>
+          </Reveal>
+
+          <motion.div
+            className="mt-14 grid gap-x-10 gap-y-10 sm:grid-cols-2"
+            initial="hidden"
+            whileInView="show"
+            viewport={viewportOnce}
+            variants={staggerContainer}
+          >
+            {audiences.map((a) => (
+              <motion.div
+                key={a.title}
+                variants={staggerItem}
+                whileHover={{ y: -3 }}
+                transition={{ duration: 0.2, ease: easeSmooth }}
+                className="border-t border-charcoal/10 pt-5"
+              >
+                <h3 className="font-display text-xl">{a.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-charcoal/60">
+                  {a.body}
+                </p>
+              </motion.div>
             ))}
           </motion.div>
         </div>
